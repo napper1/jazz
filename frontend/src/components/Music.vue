@@ -102,7 +102,7 @@
                         type="text"
                         v-model="addSongForm.title"
                         required
-                        placeholder="Enter title">
+                        placeholder="Title">
           </b-form-input>
         </b-form-group>
         <b-form-group id="form-artist-group"
@@ -112,11 +112,11 @@
                           type="text"
                           v-model="addSongForm.artist"
                           required
-                          placeholder="Enter artist">
+                          placeholder="Artist">
             </b-form-input>
           </b-form-group>
         <b-form-group id="form-link-group" label="Link:" label-for="form-link-input">
-          <b-form-input id="form-link-input" type="text" v-model="addSongForm.link" placeholder="Enter link">
+          <b-form-input id="form-link-input" type="text" v-model="addSongForm.link" placeholder="YouTube link">
           </b-form-input>
         </b-form-group>
         <b-button type="submit" variant="primary">Submit</b-button>
