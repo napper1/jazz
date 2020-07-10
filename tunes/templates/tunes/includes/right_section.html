@@ -1,0 +1,40 @@
+{% verbatim %}
+<section class="col-lg-3 right-side-section">
+  <div class="form-group" style="padding-top:15px;">
+    <div class="dropdown" v-bind:class="openSuggestion">
+      <input id="artist" v-model="artist" type="text" class="form-control" placeholder="Artist"
+             @keydown.enter='enterSuggestion'
+             @keydown.down='downSuggestion'
+             @keydown.up='upSuggestion'
+             @input='changeSuggestion'>
+      <ul class="dropdown-menu" style="width:100%">
+        <li v-for="(suggestion, index) in matches"
+            v-bind:class="{'active': isActive(index)}"
+            @click="suggestionClick(index)">
+          <a href="#">{{ suggestion }}</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="form-group">
+    <input id="title" v-model="title" type="text" class="form-control" placeholder="Title">
+  </div>
+  <div class="form-group">
+    <input type="text" id="link" placeholder="URL (optional)" class="form-control" name="link" v-model="link">
+  </div>
+  <div class="form-group">
+    <input type="text" id="tags" placeholder="Tags (e.g. Country)" class="form-control" name="tags" v-model="tags">
+  </div>
+  <button v-on:click="addSong" class="btn btn-primary">Add Song</button>
+  <br>
+  <br>
+  <h3>Enhancements</h3>
+  <ul>
+    <li>Select multiple songs and download, convert and save to mp3. This may require a celery task.</li>
+    <li>Integrate with Double-J somehow</li>
+    <li>Favourite feature: angular-js drag-and-drop style so you can move favourite songs from left hand
+    side to your favourites section or any category. Use this to categorise your favourite songs.</li>
+  </ul>
+</section>
+
+{% endverbatim %}

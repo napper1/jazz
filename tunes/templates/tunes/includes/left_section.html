@@ -1,0 +1,66 @@
+{% verbatim %}
+<section class="col-lg-3 playlist-section">
+  <div class="text-center" style="padding-top:10px">
+    <i class="fa fa-play fa-3x" aria-hidden="true"></i>
+  </div>
+
+  <h3>{{ selected_artist }}</h3>
+
+  <div class="list-group">
+    <div v-for="song in songs">
+      <a class="list-group-item"
+         v-bind:href="song.link"
+         target="_blank"
+         v-on:click="updateStatus(song)"
+         style="display: inline-block;">{{ song.title }}</a>
+      <a v-on:click="addFavourite(song)" href="#">
+        <i class="fa fa-heart-o" aria-hidden="true"></i>
+      </a>
+      <a v-bind:href="song.admin_link">
+        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+      </a>
+      <a v-on:click="downloadSong(song)">
+        <i class="fa fa-download" aria-hidden="true"></i>
+      </a>
+    </div>
+  </div>
+
+  <hr>
+  <h4>Recently added</h4>
+
+  <div v-for="song in recently_added">
+    <p>
+      <a v-bind:href="song.link" v-on:click="updateStatus(song)" target="_blank">{{ song.title }}</a>
+      <a v-on:click="downloadSong(song)">
+        <i class="fa fa-download" aria-hidden="true"></i>
+      </a>
+      <a v-on:click="addFavourite(song)" href="#">
+        <i class="fa fa-heart-o" aria-hidden="true"></i>
+      </a>
+    </p>
+
+  </div>
+  <hr>
+  <h4>Recently played</h4>
+
+  <div v-for="song in last_played">
+    <p>
+      <a v-bind:href="song.link" target="_blank">{{ song.title }}</a>
+      <a v-on:click="downloadSong(song)">
+        <i class="fa fa-download" aria-hidden="true"></i>
+      </a>
+    </p>
+  </div>
+  <hr>
+  <h4>Favourites</h4>
+
+  <div v-for="song in favourites">
+    <p>
+      <a v-bind:href="song.link" target="_blank">{{ song.title }}</a>
+      <a v-on:click="downloadSong(song)">
+        <i class="fa fa-download" aria-hidden="true"></i>
+      </a>
+    </p>
+  </div>
+</section>
+{% endverbatim %}

@@ -1,0 +1,31 @@
+{% verbatim %}
+
+<div class="well">
+  <input v-on:keyup.enter="search_youtube()" v-model="youtube_param" type="text"
+         class="form-control input-lg search" placeholder="Search YouTube...">
+</div>
+<div class="row">
+  <div class="col-sm-8 col-sm-offset-2">
+    <div class="well">
+      <h4>YouTube Results</h4>
+
+      <div class="row">
+        <div class="col-sm-6 col-md-4" v-for="result in youtube_results">
+          <div class="thumbnail">
+            <img v-bind:src="result.thumbnail">
+
+            <div class="caption">
+              <p>
+                <a v-bind:href="result.url" target="_blank">{{ result.title }}</a>
+                <button v-on:click="save_yt_song(result.title, result.url)"
+                        class="btn btn-success">Add
+                </button>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endverbatim %}

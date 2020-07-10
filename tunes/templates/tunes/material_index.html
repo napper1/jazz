@@ -1,0 +1,220 @@
+{% extends 'tunes/base.html' %}
+
+{% load static tunes_tags %}
+
+{% block page_header %}
+    <p style="margin:0;">Browse music</p>
+{% endblock %}
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/tunes_styles.css' %}">
+{% endblock %}
+{% block main %}
+
+    <ul id="slide-out tabs" class="side-nav fixed">
+        {% for artist in artists %}
+            <li class="">
+                <a class="artist" href="#artist{{ artist.id }}">{{ artist.name }}</a>
+            </li>
+        {% endfor %}
+        <li>
+            <div class="divider"></div>
+        </li>
+        <li><a class="subheader">Subheader</a></li>
+        <li><a class="waves-effect" href="#!">Third Link With Waves</a></li>
+    </ul>
+
+    <div class="section no-pad-bot" id="index-banner">
+        <div class="container">
+            <br><br>
+
+            <div class="row">
+                <div class="col s4">
+                    <div class="card left-card-add white-text">
+                        <div class="card-content">
+                            <span class="card-title">Add</span>
+
+                            <form method="post" class="add-song-form">{% csrf_token %}
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        {{ form.title }}
+                                        <label for="song_name">{{ form.title.label }}</label></div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        {{ form.artist }}
+                                        <label for="link">{{ form.artist.label }}</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        {{ form.link }}
+                                        <label for="link">{{ form.link.label }}</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        {{ form.tags }}
+                                        <label for="link">{{ form.tags.label }}</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        {#                                    <button id="add-song" class="btn blue darken-2"#}
+                                        {#                                            type="submit"#}
+                                        {#                                            name="action">#}
+                                        {#                                        <i class="material-icons right">note_add</i>Save#}
+                                        {#                                    </button>#}
+                                        <button class="btn-floating btn-large waves-effect waves-light add-music-btn right"
+                                                id="add-song">
+                                            <i class="large material-icons right">add</i></button>
+
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s8">
+                    <div class="card lt-blue">
+                        <div class="card-content white-text">
+                            <span class="card-title">Recent</span>
+                            <!-- Modal Trigger -->
+                            {#                            <a class="btn-floating btn-large waves-effect waves-light red right modal-trigger"#}
+                            {#                               href="#modal1">#}
+                            {#                                <i class="large material-icons right">mode_edit</i>#}
+                            {#                            </a>#}
+                            <table class="highlight song-table">
+                                <tbody>
+                                {% for song in recently_added %}
+                                    <tr>
+                                        <td>
+                                            {% if song.get_thumbnail %}
+                                                <a href="{{ song.link }}" target="_blank">
+                                                    <img src="{{ song.get_thumbnail }}" alt="{{ song.title }}"
+                                                         style="width: 150px;">
+                                                </a>
+                                            {% else %}
+                                                <a href="{{ song.link }}" target="_blank">
+                                                    <img src="http://placehold.it/350x150" alt="{{ song.title }}">
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{{ song.link }}" target="_blank">
+                                                <div class="center-align">
+                                                    {{ song.title }}
+                                                    <div class="right">
+                                                        <small>{{ song.get_published_at|date:"D M Y" }}</small>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col s12">
+
+                    <div class="card lt-blue">
+                        <div class="card-content white-text">
+                            <span class="card-title">Songs</span>
+
+                            <table id="songs" class="highlight song-table">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Artist</th>
+                                        <th>Link</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s12">
+                    <div class="card lt-blue">
+                        <div class="card-content white-text">
+                            <span class="card-title">Tags</span>
+                            <ul class="tabs">
+                                {% for tag in tags %}
+                                    <li class="tab col s3"><a href="#tag{{ tag.id }}">{{ tag.name }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% for tag in tags %}
+                    <div id="tag{{ tag.id }}" class="col s12">
+                        <div class="card lt-blue">
+                            <div class="card-content white-text">
+                                {#                            <span class="card-title"></span>#}
+                                <table class="highlight song-table">
+                                    <tbody>
+                                    {% show_tagged_songs tag %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+
+        <!-- Modal Structure -->
+        <div id="modal1" class="modal">
+            <form action="" method="post">{% csrf_token %}
+                {{ formset.management_form }}
+                <div class="modal-content">
+                    {% for form in formset %}
+                        {% if form.instance.id %}
+                            <h5>Editing #{{ form.instance.id }}</h5>
+                            {{ form }}
+                            <br>
+                        {% endif %}
+                    {% endfor %}
+
+                </div>
+                <div class="modal-footer">
+                    {#                    <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">Save</a>#}
+                    <button type="submit" name="action" class="btn">Save</button>
+                </div>
+            </form>
+
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block extra_footer_scripts %}
+
+    <script>
+    $(".artist").on("click", function(){
+        $.get("{% url 'get_artist_songs' %}", { name: $(this).text() })
+        .done(function(data){
+            var songs = data.songs;
+            var rows = "";
+            songs.forEach(function(item){
+                rows += "<tr> <td>"+item.title+"</td><td>" + item.artist__name + "</td><td> <a target='_blank' href='" + item.link + "'>Listen</a></td>" + "</tr>";
+            });
+            $("#songs tbody").html("").append(rows);
+        });
+    })
+    </script>
+
+
+{% endblock %}

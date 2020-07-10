@@ -1,0 +1,118 @@
+{% verbatim %}
+<div class="well">
+  <input v-model="search_param" type="text" class="form-control input-lg search"
+         placeholder="Search my songs...">
+</div>
+
+<small>Downloads: /Users/mac/projects/music/media/youtube_exports</small>
+
+<div class="row">
+  <div class="col-sm-8 col-sm-offset-2">
+    <div v-if="results.length" class="well">
+      <h4>Results</h4>
+
+      <div v-for="result in results">
+        <p>
+          {{ result.title }} - {{ result.artist.name }}
+          <a v-bind:href="result.link" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i></a>
+          <a v-bind:href="result.admin_link"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+<hr>
+
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist" style="display: inline-block;padding:0;">
+  <li role="presentation" class="active"><a href="#artists" aria-controls="home" role="tab" data-toggle="tab">
+    Artists</a>
+  </li>
+  <li role="presentation"><a href="#ra" aria-controls="ra" role="tab" data-toggle="tab">Recently Added</a></li>
+  <li role="presentation"><a href="#tags" aria-controls="tags" role="tab" data-toggle="tab">Tags</a></li>
+  <li role="presentation"><a href="#uplifting" aria-controls="uplifting" role="tab" data-toggle="tab">Uplifting</a></li>
+</ul>
+<!-- Tab panes -->
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="artists">
+    <h3>Artists</h3>
+
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="btn-toolbar">
+          <div class="btn-group btn-group-lg">
+            <button class="btn btn-default"
+                    v-for="letter in letters"
+                    v-on:click="get_artists_by_letter(letter)">{{ letter }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="well">
+          <table class="table artist-table">
+            <tr v-for="artist in artists" class="artist-tr" v-on:click="get_songs(artist)">
+              <td>
+                <h3><a>{{ artist.name }}</a></h3>
+              </td>
+              <td>
+                <div class="huge">{{ artist.song_count }}</div>
+                <span class="small">Songs</span>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div role="tabpanel" class="tab-pane" id="ra">
+    <h4>Showing last 3 months</h4>
+    <div>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Artist</th>
+            <th>Date added</th>
+            <th>Listen</th>
+            <th>Download</th>
+            <th>Favourite</th>
+          </tr>
+        </thead>
+        <tbody>
+        <tr v-for="song in recently_added_all">
+          <td>{{ song.title }}</td>
+          <td>{{ song.artist.name }}</td>
+          <td>{{ song.created | formatDate }}</td>
+          <td><a v-bind:href="song.link" v-on:click="updateStatus(song)" target="_blank" class="btn btn-primary">
+            Listen</a></td>
+          <td><a v-on:click="downloadSong(song)">
+            <i class="fa fa-download" aria-hidden="true"></i>
+          </a>
+          </td>
+          <td>
+            <a v-on:click="addFavourite(song)" href="#">
+              <i class="fa fa-heart-o" aria-hidden="true"></i>
+            </a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div role="tabpanel" class="tab-pane" id="tags">
+    <p>Load tags here</p>
+  </div>
+  <div role="tabpanel" class="tab-pane" id="uplifting">
+    {% endverbatim %}
+    <ul>
+      {% for song in uplifting_songs %}
+        <li>{{ song }}</li>
+      {% endfor %}
+    </ul>
+    {% verbatim %}
+  </div>
+</div>
+{% endverbatim %}

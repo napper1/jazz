@@ -1,0 +1,63 @@
+<!-- Modal Structure -->
+<div id="modal-edit" class="modal">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                {#                <h4>Edit Snippet</h4>#}
+                <form action="{% url 'edit_snippets' %}" method="post">{% csrf_token %}
+                    {{ formset.management_form }}
+                    {% for form in formset %}
+                        {{ form.id }}
+                        <div id="edit-snippet-{{ form.instance.id }}" style="display: none;"
+                             class="edit-snippet-forms">
+                            {% if form.instance.id %}
+                                <div class="row">
+                                    <div class="col-s12">
+                                        <h5>Editing #{{ form.instance.id }}</h5>
+                                        <div class="input-field">
+                                            {{ form.title }}
+                                            <label for="title">{{ form.title.label }}</label>
+                                        </div>
+                                        {{ form.content }}
+                                        <p>
+                                            {{ form.DELETE }}
+                                            <label for="id_form-{{ forloop.counter0 }}-DELETE">Delete</label>
+                                        </p>
+                                        <br>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <button class="btn-floating btn-large waves-effect waves-light red right"
+                                    type="submit">
+                                <i class="large material-icons right">done</i></button>
+                        </div>
+                    </div>
+                </form>
+                {#                <form method="post">{% csrf_token %}#}
+                {#                    <div class="row">#}
+                {#                        <div class="input-field col s6 input-snippet-title">#}
+                {#                            <input type="text" class="input-snippet-title" value="">#}
+                {#                            <label for="title" class="black-text">Title</label>#}
+                {#                        </div>#}
+                {#                    </div>#}
+                {#                    <div class="row">#}
+                {#                        <div class="input-field col s12 input-snippet-content">#}
+                {#                        </div>#}
+                {#                    </div>#}
+                {#                    <div class="row">#}
+                {#                        <div class="input-field col s12">#}
+                {#                            <button class="btn-floating btn-large waves-effect waves-light red right"#}
+                {#                                    type="submit">#}
+                {#                                <i class="large material-icons right">done</i></button>#}
+                {#                        </div>#}
+                {#                    </div>#}
+                {#                </form>#}
+
+            </div>
+        </div>
+    </div>
+</div>

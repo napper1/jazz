@@ -1,0 +1,26 @@
+{% for song in songs %}
+    <tr>
+        <td>
+            {% if song.get_thumbnail %}
+                <a href="{{ song.link }}" target="_blank">
+                    <img src="{{ song.get_thumbnail }}" alt="{{ song.title }}"
+                         style="width: 150px;">
+                </a>
+            {% else %}
+                <a href="{{ song.link }}" target="_blank">
+                    <img src="http://placehold.it/350x150" alt="{{ song.title }}">
+                </a>
+            {% endif %}
+        </td>
+        <td>
+            <a href="{{ song.link }}" target="_blank">
+                <div class="center">
+                    {{ song.title }}
+                    <div class="right">
+                        <small>{{ song.get_published_at|date:"D M Y" }}</small>
+                    </div>
+                </div>
+            </a>
+        </td>
+    </tr>
+{% endfor %}

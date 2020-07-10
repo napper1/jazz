@@ -1,0 +1,68 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Music Library</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/cropper.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/featherlight.min.css' %}" type="text/css" rel="stylesheet" />
+    <link href="{% static 'css/font-awesome.min.css' %}" type="text/css" rel="stylesheet" />
+    <link href="{% static 'css/apps.css' %}" type="text/css" rel="stylesheet" />
+    <link href="{% static 'css/styles.css' %}" type="text/css" rel="stylesheet" />
+    <link href="{% static 'css/jquery.growl.css' %}" type="text/css" rel="stylesheet" />
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    {% block extra_head %}{% endblock %}
+
+</head>
+
+<body>
+
+{% block content %}
+{% endblock %}
+
+<!-- jQuery Version 1.11.1 -->
+<script src="{% static 'js/jquery.js' %}"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/cropper.min.js' %}"></script>
+<script src="{% static 'js/jquery.growl.js' %}"></script>
+<script src="{% static 'js/moment.min.js' %}"></script>
+<script src="{% static 'js/featherlight.min.js' %}"></script>
+<script src="{% static 'js/vue.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/vue.resource/1.2.1/vue-resource.min.js"></script>
+<script src="{% static 'js/controller.js' %}"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.matchHeight/0.7.2/jquery.matchHeight-min.js"></script>
+<script src="{% static 'js/jquery.slimscroll.min.js' %}"></script>
+
+
+{% block footer_scripts %}
+  <script>
+  $(document).ready(function(){
+    $(function() {
+        $('.thumbnail').matchHeight();
+    });
+  });
+  </script>
+{% endblock %}
+
+</body>
+
+</html>

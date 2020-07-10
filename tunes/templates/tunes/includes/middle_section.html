@@ -1,0 +1,36 @@
+{% load tunes_tags %}
+
+<section class="col-lg-6 artist-section">
+  <div>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist" style="display: inline-block;padding:0;">
+      <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">My
+        Music</a>
+      </li>
+      <li role="presentation"><a href="#yt" aria-controls="yt" role="tab" data-toggle="tab">YouTube</a></li>
+    </ul>
+
+    <a href="{% url 'admin:tunes_song_changelist' %}" class="btn btn-default pull-right">Edit songs</a>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="home">
+        {% include 'tunes/includes/tabs/home_tab.html' %}
+      </div>
+      <div role="tabpanel" class="tab-pane" id="yt">
+        {% include 'tunes/includes/tabs/youtube_tab.html' %}
+      </div>
+      <div role="tabpanel" class="tab-pane" id="tags">
+        <p>Load tags here</p>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="uplifting">
+        <ul>
+        {% for song in uplifting_songs %}
+          <li>{{ song }}</li>
+        {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>

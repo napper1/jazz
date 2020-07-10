@@ -1,0 +1,259 @@
+{% extends 'tunes/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="row">
+          <div class="col-sm-3">
+            <img src="{% static 'images/out.jpg' %}" alt="" width="300">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fullwidth-section light-blue-section">
+    <div class="container">
+      <div class="col-lg-8 col-lg-offset-2"><p class="lead text-center" style="color: #0d2b64;">
+        At Our Lady of Mercy
+        College Parramatta, we’re expanding beyond what we know we can be</p>
+      </div>
+      <div>
+        <div class="content-blocks">
+          <div class="grid">
+            <div class="span-row-2">
+              <div class="image-wrap"><img alt="" src="/static/images/principal-img.jpg" class="full">
+
+                <div class="block-content"><h4>Welcome from our Principal Stephen M Walsh</h4>
+
+                  <p>Praesent commodo curus magna, vel scelerisque nisl consectetur et.</p>
+
+                  <p class="more"><a href="/about-college/read-principals-welcome/">Welcome to OLMC</a></p></div>
+              </div>
+            </div>
+            <div class="span-col-2">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="image-wrap"><img alt="" src="/static/images/lab-img.jpg" class="full"></div>
+                </div>
+                <div class="col-md-6">
+                  <div class="block-content"><h4>Our rich history</h4>
+
+                    <p>Praesent commodo curus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus
+                      sit amet fermentum. </p>
+
+                    <p class="more"><a href="/about-college/history-olmc/">Our exciting story</a></p></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="image-wrap"><img alt="" src="/static/images/1DX_0767.jpg" class="full">
+
+                <div class="block-content"><h4>A Merchy Education</h4>
+
+                  <p>Praesent commodo curus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus
+                    sit amet fermentum. </p>
+
+                  <p class="more"><a href="/about-college/mercy-education/">What make it so good</a></p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+{% endblock %}
+
+<div class="fullwidth-section light-blue-section menu-top-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-5">
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="menu_img_box">
+              <div class="image-wrap">
+                <a href="/about-college/read-principals-welcome/">
+                  <img alt="" src="/static/images/principal-img.jpg" class="full">
+                </a>
+                <div class="block-content">
+                  <div class="more">
+                    <a href="/about-college/read-principals-welcome/">Principals' Welcome</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="menu_img_box">
+              <div class="image-wrap">
+                <a href="/about-college/head-girls-welcome/">
+                  <img alt="" src="/static/images/principal-img.jpg" class="full">
+                </a>
+                <div class="block-content">
+                  <div class="more">
+                    <a href="/about-college/head-girls-welcome/">Head Girls' Welcome</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-5">
+        <div class="row">
+          <div class="col-md-6" style="padding-right: 0;padding-left: 30px;">
+            <div class="menu_links_tree">
+              <p><a href="/about-college/mercy-education/">A Mercy Education</a></p>
+
+              <p><a href="/about-college/mercy-tree/">Mercy Tree</a></p>
+
+              <p><a href="/about-college/history-olmc/">History of OLMC</a></p>
+
+              <p><a href="/about-college/governance/">Governance</a></p>
+
+              <p><a href="/about-college/our-teachers-other-staff/">Our Teachers &amp; Other Staff</a></p>
+
+              <p><a href="/about-college/master-plan/">Master Plan</a></p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="menu_links_tree">
+              <p><a href="/about-college/policies-forms/">Policies &amp; Forms</a></p>
+
+              <p><a href="/about-college/employment-opportunities/">Employment Opportunities</a></p>
+
+              <p><a href="/about-college/annual-report/">Annual Report</a></p>
+
+              <p><a href="/about-college/location-access-college/">Location &amp; access to the College</a></p>
+
+              <p><a href="/about-college/online-payments/">Online Payments</a></p>
+
+              <p><a href="/about-college/sustainability-olmc/">Sustainability at OLMC</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <div class="menu_btn">
+          <a href="/about-college/book-tour/" class="btn btn-block btn-menu">Book a Tour</a>
+        </div>
+        <div class="menu_btn">
+          <a href="/about-college/online-payments/" class="btn btn-block btn-menu">Online Payments</a>
+        </div>
+        <div class="menu_btn">
+          <a href="/about-college/contact-us/" class="btn btn-menu btn-block">Contact Us</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+	.menu-top-section{
+		padding: 40px 0;
+		box-shadow: 0px 3px 6px rgba(0,0,0,0.1);
+		-webkit-font-smoothing: auto;
+	}
+	.menu_img_box{
+		box-shadow: 0px 3px 3px rgba(0,136,206,0.1);
+		background: #fff;
+    	position: relative;
+	}
+	.menu_img_box .image-wrap img {
+		/*use a cropped image instead*/
+	    max-height: 171px;
+	}
+	.menu_img_box .block-content {
+	    padding: 1rem 1rem 0.5rem 1rem;
+	    color: #00205C;
+	}
+	.menu_img_box .block-content .more{
+	    margin: 0;
+	    font-weight: 500;
+	}
+	.menu_img_box .block-content .more a{
+    	color: #00205C;
+	}
+
+	.menu_links_tree p {
+	    font-family: 'URW Geometric';
+	    font-weight: 500;
+	}
+
+	.menu_links_tree p a{
+		color: #00205C;
+	}
+
+	.menu_btn{
+		margin-bottom: 15px;
+	}
+
+	.btn-menu{
+	    color: #0088CE;
+	    background: #fff;
+	    padding: .5rem 1.5rem .5rem;
+	    border-radius: 0;
+	    box-shadow: 0px 3px 3px rgba(0,136,206,0.1);
+	    font-weight: 500;
+	    font-size: 15px;
+	}
+
+</style>
+
+
+<div class="fullwidth-section light-blue-section">
+  <div class="container">
+    <div class="col-lg-8 col-lg-offset-2"><p class="lead text-center" style="color: #0d2b64;">At Our Lady of Mercy
+      College Parramatta, we’re expanding beyond what we know we can be</p></div>
+    <div>
+      <div class="content-blocks">
+        <div class="grid">
+          <div>
+            <div class="image-wrap"><img alt="" src="/static/images/1DX_0767.jpg" class="full">
+
+              <div class="block-content"><h4>A Merchy Education</h4>
+
+                <p>Praesent commodo curus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus
+                  sit amet fermentum. </p>
+
+                <p class="more"><a href="/about-college/mercy-education/">What make it so good</a></p></div>
+            </div>
+          </div>
+          <div>
+            <div class="image-wrap"><img alt="" src="/static/images/1DX_0767.jpg" class="full">
+
+              <div class="block-content"><h4>Teachers and Staff </h4>
+
+                <p>Praesent commodo curus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus
+                  sit amet fermentum. </p>
+
+                <p class="more"><a href="/about-college/our-teachers-other-staff/">The team who make it happen</a></p>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="image-wrap"><img alt="" src="/static/images/1DX_0767.jpg" class="full">
+
+              <div class="block-content"><h4>Teachers and Staff </h4>
+
+                <p>Praesent commodo curus magna, vel scelerisque nisl consectetur et. Cras mattis consectetur purus
+                  sit amet fermentum. </p>
+
+                <p class="more"><a href="/about-college/our-teachers-other-staff/">The team who make it happen</a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
