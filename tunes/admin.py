@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Song, Artist, YoutubeVideo, SongDocument
+from .models import Song, Artist, YoutubeVideo, SongDocument, SongCategory
 
 
 class SongAdmin(admin.ModelAdmin):
@@ -48,7 +48,13 @@ class SongDocumentAdmin(admin.ModelAdmin):
     list_display = ['id', 'document', 'document_two', 'data']
 
 
+class SongCategoryAdmin(admin.ModelAdmin):
+    list_display = ['title', 'created']
+    search_fields = ['title']
+
+
 admin.site.register(Song, SongAdmin)
 admin.site.register(Artist, ArtistAdmin)
 admin.site.register(YoutubeVideo, YoutubeVideoAdmin)
 admin.site.register(SongDocument, SongDocumentAdmin)
+admin.site.register(SongCategory, SongCategoryAdmin)

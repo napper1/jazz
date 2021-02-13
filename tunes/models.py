@@ -23,6 +23,8 @@ class Song(TimeStampedModel):
     last_played = models.DateTimeField(null=True, blank=True)
     is_favourite = models.BooleanField("Is Favourite?", default=False)
     downloaded = models.BooleanField("Downloaded?", default=False)
+    category = models.ForeignKey("tunes.SongCategory", null=True, blank=True, on_delete=models.SET_NULL)
+    spotify = models.BooleanField("Spotify Track", default=False)
 
     tags = TaggableManager(blank=True)
 
@@ -164,6 +166,18 @@ class Artist(models.Model):
 
     def song_count(self):
         return self.songs.all().count()
+
+
+class SongCategory(models.Model):
+    title = models.CharField("Title", max_length=100)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Song Category"
+        verbose_name_plural = "Song Categories"
+
+    def __str__(self):
+        return self.title
 
 
 MOOD_CHOICES = (

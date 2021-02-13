@@ -119,9 +119,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-au'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Australia/Sydney'
 
 USE_I18N = True
 
@@ -159,6 +159,11 @@ DBBACKUP_STORAGE = 'storages.backends.dropbox.DropBoxStorage'
 DBBACKUP_STORAGE_OPTIONS = {
     'oauth2_access_token': '',
 }
+
+SPOTIFY_CLIENT_ID = os.environ.get("SPOTIFY_CLIENT_ID", "")
+SPOTIFY_SECRET = os.environ.get("SPOTIFY_SECRET", "")
+SPOTIFY_REDIRECT_URL = os.environ.get("SPOTIFY_REDIRECT_URL", "")
+SPOTIFY_LOCAL_FILE = 'tekore.cfg'
 
 ##################
 # LOCAL SETTINGS #

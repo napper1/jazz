@@ -20,11 +20,12 @@ from django.contrib import admin
 from django.urls import include
 from rest_framework import routers
 
-from tunes.viewsets import ArtistViewSet, SongViewSet
+from tunes.viewsets import ArtistViewSet, SongViewSet, SongCategoryViewSet
 
 router = routers.SimpleRouter()
 router.register(r'artists', ArtistViewSet)
 router.register(r'songs', SongViewSet)
+router.register(r'song-categories', SongCategoryViewSet)
 
 
 urlpatterns = [

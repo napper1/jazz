@@ -1,25 +1,61 @@
 <template>
-  <div class="music" v-bind:class="{ padd_top: prev_iframe_url }" v-scroll="showScroller">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-sm-12">
-          <div class="row">
-            <div class="col-sm-4">
-              <h1 class="d-inline-block">
-                <i class="fa fa-music" style="margin-right:5px"></i>
-                Music
-              </h1>
+  <div class="music w-100 h-100 mh-100"
+       v-scroll="showScroller"
+       v-bind:class="{ padd_top: prev_iframe_url }">
+    <div class="container-fluid w-100 h-100 mh-100">
+      <div class="row h-100 mh-100">
+        <div class="col-2" id="sticky-sidebar">
+          <div class="sticky-top">
+            <div class="nav flex-column" id="side-col">
+                <div class="pt-2">
+                  <h1 class="fancy-title h1 d-inline-block mb-4"><i class="fa fa-music mr-1"></i>
+                    Music
+                  </h1>
+                </div>
+                <h3 class="fancy-title">Categories</h3>
+                <div class="list-group list-filters">
+                  <b-button class="list-group-item list-group-item-action" :class="getAllCategoryClass()" type="button" varient="warning" @click="getAllSongs">All</b-button>
+                  <b-button class="list-group-item list-group-item-action" :class="getActiveCategory(cat)" type="button" varient="primary" v-for="(cat, index) in song_categories" :key="index"
+                            @click="filterSongsByCategory(cat)">
+                    {{ cat.text }}
+                  </b-button>
+                </div>
+                <h3 class="fancy-title">Spotify</h3>
+                <div class="list-group list-filters">
+                  <b-button class="list-group-item list-group-item-action"
+                            type="button" @click="spotifyLogin()">
+                    Login
+                  </b-button>
+                  <b-button class="list-group-item list-group-item-action"
+                            :class="{'active-cat': spotify_tracks_class}"
+                            type="button" @click="getSpotifyTracks()">
+                    My Tracks
+                  </b-button>
+                </div>
             </div>
-            <div class="col-sm-3">
-              <input class="form-control search_box" v-model="song_query" type="text" placeholder="Search..."
-                     @keyup="lookupSong()">
-            </div>
-            <div class="col-sm-5">
-              <div class="d-inline-block pull-right top-filters">
-                <button type="button" class="btn btn-secondary btn-sm" @click="backupMusic()">Backup Songs</button>
-                <button type="button" class="btn btn-success btn-sm" v-b-modal.song-modal>Add Song</button>
-                <a href="https://www.abc.net.au/triplej/listen-live/double-j-player/"
-                   class="btn btn-primary btn-sm" target="_blank">Double J</a>
+          </div>
+        </div>
+        <div class="col">
+          <div class="row top-header">
+            <div class="col">
+              <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-3">
+                  <div class="d-inline-block">
+                    <mycircle v-if="filter_loading"></mycircle>
+                  </div>
+                </div>
+                <div class="col-3">
+                  <input class="form-control search_box" v-model="song_query" type="text" placeholder="Search..."
+                         @keyup="lookupSong()">
+                </div>
+                <div class="col-6">
+                  <div class="d-inline-block pull-right top-filters">
+                    <button type="button" class="btn btn-secondary btn-sm" @click="backupMusic()">Backup Songs</button>
+                    <button type="button" class="btn btn-success btn-sm" v-b-modal.song-modal>Add Song</button>
+                    <a href="https://www.abc.net.au/triplej/listen-live/double-j-player/"
+                       class="btn btn-primary btn-sm" target="_blank">Double J</a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -31,62 +67,72 @@
             </div>
             <youtube :video-id="videoId" @ready="ready" @playing="playing" @ended="ended" :player-vars="{autoplay: 1}"></youtube>
           </div>
-
-          <div class="row" style="display: none;">
-            <div class="col-xs-12">
-              <label>Quantity</label>
-              <input :type="quantity_group.field_type" v-model.number="quantity_group.selected" v-if="quantity_group.field_type=='number'">
-              <input :type="quantity_group.field_type" v-model="quantity_group.selected" v-else>
-            </div>
-          </div>
-
-          <alert :message="message" v-if="message"></alert>
-          <div class="songs-section">
-            <div class="row" v-for="(song, index) in songs" :key="index">
-              <div class="col-sm-12">
-                <div class="song" @mouseover="showActions(song)">
-                  <div class="song_num">
-                    <p class="">{{ songNumber(index) }}</p>
-                  </div>
-                  <img @click="showPreview(song)" v-b-modal.song-preview-modal src="https://via.placeholder.com/70" alt="" width="70" height="70">
-                  <div class="song_name">
-                    <h5><strong>{{ song.title }}</strong></h5>
-                    <p>{{ song.artist.name }}</p>
-                  </div>
-                  <div class="song-actions">
-                    <div v-if="selected_song === song" class="pull-left m-md-2">
-                      <mycircle v-if="loading"></mycircle>
+          <alert :message="message" class="music-alert-box" :class="{'alert-active': show_alert_msg}"></alert>
+          <div class="row songs-section">
+            <div class="col">
+              <h1>{{ title }}</h1>
+              <spotifytracks :tracks="spotify_tracks"></spotifytracks>
+              <div class="row" v-for="(song, index) in songs" :key="index">
+                <div class="col-sm-12">
+                  <div class="song d-flex" :class="getSongClass(song)" @mouseover="showActions(song)" @click="setSongSelection(song)">
+  <!--                  <div class="song_num">-->
+  <!--                    <p class="">{{ songNumber(index) }}</p>-->
+  <!--                  </div>-->
+                    <div class="song-detail">
+                      <div class="row">
+                        <div class="col-1">
+                          <a :href="song.link" v-if="song.spotify" target="_blank">
+                            <img class="song_thumbnail" src="https://via.placeholder.com/60" alt="">
+                          </a>
+                          <img v-else class="song_thumbnail" @click="showPreview(song)" v-b-modal.song-preview-modal src="https://via.placeholder.com/60" alt="">
+                        </div>
+                        <div class="col-10">
+                          <div class="song_name">
+                            <h5><strong>{{ song.title }}</strong> <b-badge v-if="song.song_category">{{ song.song_category.title }}</b-badge></h5>
+                            <p class="artist">{{ song.artist.name }} </p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <b-dropdown id="dropdown-dropleft" dropleft text="More" class="m-md-2 pull-right" v-if="selected_song === song">
-                      <b-dropdown-item @click="showPreview(song)" v-b-modal.song-preview-modal>
-                        <i class="fa fa-music" aria-hidden="true"></i>
-                        Preview
-                      </b-dropdown-item>
-                      <b-dropdown-item v-b-modal.song-update-modal @click="editSong(song)">
-                        <i class="fa fa-edit" aria-hidden="true"></i>
-                        Edit
-                      </b-dropdown-item>
-                      <b-dropdown-item @click="onDeleteSong(song)">
-                        <i class="fa fa-times" aria-hidden="true"></i>
-                        Delete
-                      </b-dropdown-item>
-                      <b-dropdown-divider></b-dropdown-divider>
-                      <b-dropdown-item @click="downloadSong(song)" class="download-song">
-                        <i class="fa fa-download" aria-hidden="true"></i>
-                        Download to media
-                      </b-dropdown-item>
-                      <b-dropdown-item v-if="song.downloaded" class="download-song" :href="api_host + song.media_link" target="_blank">
-                        <i class="fa fa-download" aria-hidden="true"></i>
-                        Download to device
-                      </b-dropdown-item>
-                    </b-dropdown>
+                    <div class="song-actions d-flex justify-content-center align-items-center">
+                      <div v-if="selected_song === song" class="pull-left">
+                        <mycircle v-if="loading"></mycircle>
+                      </div>
+                      <div class="d-flex justify-content-center align-items-center" v-if="selected_song === song">
+                        <a :href="song.link" v-if="song.spotify" target="_blank">
+                          <b-icon icon="play-fill" aria-hidden="true" class="play-btn"></b-icon>
+                        </a>
+                        <b-icon v-else icon="play-fill" aria-hidden="true" class="play-btn" @click="showPreview(song)" v-b-modal.song-preview-modal></b-icon>
+                        <b-dropdown id="dropdown-dropleft" dropleft class="song-actions-dropdown pull-right">
+                          <template #button-content>
+                            <b-icon icon="three-dots-vertical" aria-hidden="true"></b-icon>
+                          </template>
+                          <b-dropdown-item v-b-modal.song-update-modal @click="editSong(song)">
+                            <i class="fa fa-edit" aria-hidden="true"></i>
+                            Edit
+                          </b-dropdown-item>
+                          <b-dropdown-item @click="onDeleteSong(song)">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Delete
+                          </b-dropdown-item>
+                          <b-dropdown-divider></b-dropdown-divider>
+                          <b-dropdown-item @click="downloadSong(song)" class="download-song">
+                            <i class="fa fa-download" aria-hidden="true"></i>
+                            Download to media
+                          </b-dropdown-item>
+                          <b-dropdown-item v-if="song.downloaded" class="download-song" :href="api_host + song.media_link" target="_blank">
+                            <i class="fa fa-download" aria-hidden="true"></i>
+                            Download to device
+                          </b-dropdown-item>
+                        </b-dropdown>
+                      </div>
+                    </div>
                   </div>
                 </div>
+                <hr>
               </div>
-              <hr>
             </div>
           </div>
-
         </div>
       </div>
     </div>
@@ -115,10 +161,15 @@
                           placeholder="Artist">
             </b-form-input>
           </b-form-group>
-        <b-form-group id="form-link-group" label="Link:" label-for="form-link-input">
-          <b-form-input id="form-link-input" type="text" v-model="addSongForm.link" placeholder="YouTube link">
-          </b-form-input>
-        </b-form-group>
+          <b-form-group id="form-link-group" label="Link:" label-for="form-link-input">
+            <b-form-input id="form-link-input" type="text" v-model="addSongForm.link" placeholder="YouTube link">
+            </b-form-input>
+          </b-form-group>
+          <b-form-group id="form-category-group"
+                        label="Category:"
+                        label-for="form-artist-input">
+            <b-form-select v-model="addSongForm.selected_category" :options="song_categories"></b-form-select>
+          </b-form-group>
         <b-button type="submit" variant="primary">Submit</b-button>
         <b-button type="reset" variant="danger">Reset</b-button>
       </b-form>
@@ -152,8 +203,13 @@
           <b-form-input id="form-link-input" type="text" v-model="editForm.link" placeholder="Enter link">
           </b-form-input>
         </b-form-group>
+        <b-form-group id="form-song-category-group"
+                        label="Category:"
+                        label-for="form-category-input">
+            <b-form-select v-model="editForm.selected_category" :options="song_categories"></b-form-select>
+        </b-form-group>
         <b-button type="submit">Update</b-button>
-        <b-button type="reset" variant="danger">Cancel</b-button>
+        <b-button @click="hideEditModal" variant="danger">Cancel</b-button>
       </b-form>
     </b-modal>
     <b-modal ref="previewSongModal"
@@ -182,10 +238,8 @@ import Circle from 'vue-loading-spinner/src/components/Circle'
 import { RotateSquare2 } from 'vue-loading-spinner'
 import { Circle2 } from 'vue-loading-spinner'
 import VueYouTubeEmbed from 'vue-youtube-embed'
-import 'bootstrap/dist/css/bootstrap.css';
 import datePicker from 'vue-bootstrap-datetimepicker';
-import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css';
-
+import SpotifyTracks from "./SpotifyTracks";
 
 export default {
   name: 'Music',
@@ -197,14 +251,17 @@ export default {
         title: '',
         artist: '',
         link: '',
+        selected_category: '',
       },
       editForm: {
         id: '',
         title: '',
         artist: '',
         link: '',
+        selected_category: '',
       },
       loading: false,
+      filter_loading: false,
       selected_song: null,
       iframe_url: "",
       prev_iframe_url: "",
@@ -230,6 +287,13 @@ export default {
         field_type: 'number',
         selected: "",
       },
+      song_categories: [],
+      alert_delay_time: 1500,
+      show_alert_msg: false,
+      selected_category: "",
+      active_song: "",
+      spotify_tracks: [],
+      title: "All Songs",
     };
   },
   components: {
@@ -238,6 +302,7 @@ export default {
     RotateSquare2,
     Circle2,
     datePicker,
+    spotifytracks: SpotifyTracks,
   },
   methods: {
     lookupSong() {
@@ -277,23 +342,50 @@ export default {
         'selected': selected.includes(child.field_value)
       }
     },
+    getAllSongs(){
+        this.selected_category = 'all';
+        this.title = 'All Songs';
+        this.getSongs();
+    },
     getSongs() {
+      this.spotify_tracks = [];
+      this.filter_loading = true;
       const path = this.api_host + '/songs/';
       axios.get(path)
         .then((res) => {
           this.songs = res.data;
+          this.filter_loading = false;
         })
         .catch((error) => {
           // eslint-disable-next-line
           console.error(error);
+          this.filter_loading = false;
         });
+    },
+    getSongCategories() {
+      const path = this.api_host + '/song-categories/';
+      axios.get(path)
+          .then((res) => {
+              var data = res.data;
+              for (var i = 0; i < data.length; i++){
+                  var category = data[i];
+                  console.log(category);
+                  this.song_categories.push({value: category.id, text: category.title})
+              }
+          })
+          .catch((error) => {
+              console.log(error);
+          })
     },
     addSong(payload) {
       const path = this.api_host + '/api-add-song/';
+      const delay = ms => new Promise(res => setTimeout(res, ms));
       axios.post(path, payload)
         .then(() => {
           this.getSongs();
+          this.show_alert_msg = true;
           this.message = "Song added!";
+          this.removeAlert();
         })
         .catch((error) => {
           // eslint-disable-next-line
@@ -305,10 +397,12 @@ export default {
       this.addSongForm.title = '';
       this.addSongForm.artist = '';
       this.addSongForm.link = '';
+      this.addSongForm.selected_category = '';
       this.editForm.id = '';
       this.editForm.title = '';
       this.editForm.artist = '';
       this.editForm.link = '';
+      this.editForm.selected_category = '';
     },
     onSubmit(evt) {
       evt.preventDefault();
@@ -317,6 +411,7 @@ export default {
         title: this.addSongForm.title,
         artist: this.addSongForm.artist,
         link: this.addSongForm.link,
+        category: this.addSongForm.selected_category,
       };
       this.addSong(payload);
       this.initForm();
@@ -328,15 +423,29 @@ export default {
     },
     editSong(song) {
       this.editForm = song;
+      console.log(this.editForm);
+      // var category_dict = {};
+      // this.song_categories.forEach(function(el){
+      //     if (el.value == song.category){
+      //         category_dict = el
+      //     }
+      // });
+      // console.log(category_dict)
+      if (song.category){
+        this.editForm.selected_category = song.category;
+      }
     },
     onSubmitUpdate(evt) {
       evt.preventDefault();
       this.$refs.editSongModal.hide();
+      console.log(evt);
       const payload = {
         title: this.editForm.title,
         artist: this.editForm.artist.id,
-        link: this.editForm.link
+        link: this.editForm.link,
+        category: this.editForm.selected_category,
       };
+      console.log(payload)
       this.updateSong(payload, this.editForm.id);
     },
     updateSong(payload, song_id) {
@@ -344,14 +453,28 @@ export default {
       axios.put(path, payload)
         .then(() => {
           this.getSongs();
+          this.show_alert_msg = true;
           this.message = "Song updated!";
+          this.removeAlert();
         })
         .catch((error) => {
           // eslint-disable-next-line
           console.error(error);
           this.getSongs();
+          this.show_alert_msg = true;
           this.message = "An error occurred!";
+          this.removeAlert();
         });
+    },
+    removeAlert() {
+      // Clear the alert box by setting a timer for a few seconds before clearing alert message.
+      console.log('start timer');
+      const delay = ms => new Promise(res => setTimeout(res, ms));
+      delay(this.alert_delay_time).then(() => {
+         console.log('finished');
+         this.show_alert_msg = false;
+         // this.message = "";
+      });
     },
     onResetUpdate(evt) {
       evt.preventDefault();
@@ -363,7 +486,9 @@ export default {
       axios.delete(path)
         .then(() => {
           this.getSongs();
+          this.show_alert_msg = true;
           this.message = 'Song removed!';
+          this.removeAlert();
         })
         .catch((error) => {
           // eslint-disable-next-line
@@ -391,13 +516,17 @@ export default {
       this.loading = true;
       axios.post(this.api_host + '/download/' + song.id + '/')
           .then(() => {
+            this.show_alert_msg = true;
             this.message = "Song downloaded to media folder!"
             this.loading = false;
             // refresh songs list
             this.getSongs();
+            this.removeAlert();
           })
           .catch((error) => {
+            this.show_alert_msg = true;
             this.message = "An error occurred! " + error;
+            this.removeAlert();
             this.loading = false;
           });
     },
@@ -457,209 +586,97 @@ export default {
       this.loading = true;
       axios.post(this.api_host + '/api/backup-music/')
           .then(() => {
+            this.show_alert_msg = true;
             this.message = "Songs backed up to Dropbox!"
             this.loading = false;
+            this.removeAlert();
           })
           .catch((error) => {
+            this.show_alert_msg = true;
             this.message = "An error occurred! " + error;
             this.loading = false;
+            this.removeAlert();
           });
+    },
+    hideEditModal() {
+      this.$refs['editSongModal'].hide();
+    },
+    filterSongsByCategory: function(category){
+      this.selected_category = category;
+      this.title = this.selected_category['text'];
+      this.filter_loading = true;
+      const path = this.api_host + '/songs/?category=' + category.value;
+      axios.get(path)
+        .then((response) => {
+          this.songs = response.data;
+          this.filter_loading = false;
+          this.spotify_tracks = [];
+        })
+        .catch((error) => {
+          console.error(error);
+          this.filter_loading = false;
+        });
+    },
+    getActiveCategory(category) {
+        if (category === this.selected_category){
+            return 'active-cat'
+        }
+    },
+    getAllCategoryClass(){
+        if (this.selected_category ==='all' || this.selected_category === ''){
+            return 'active-cat'
+        }
+    },
+    getSongClass(song){
+        if (this.active_song === song){
+          return 'active-song'
+        }
+    },
+    setSongSelection(song){
+        this.active_song = song;
+    },
+    spotifyLogin(){
+      const path = this.api_host + '/spotify/callback/';
+      axios.get(path)
+          .then((response) => {
+              console.log(response);
+          })
+          .catch((error) => {
+              console.log(error);
+          })
+    },
+    getSpotifyTracks(){
+      this.title = "Spotify Tracks";
+      const path = this.api_host + '/spotify/user/tracks';
+      axios.get(path)
+        .then((response) => {
+            console.log(response);
+            this.spotify_tracks = response.data;
+            this.songs = [];
+            this.selected_category = null;
+        })
+        .catch((error) => {
+            console.log(error);
+        })
     }
   },
   created() {
     this.getSongs();
+    this.getSongCategories();
   },
   computed: {
     now: function(){
       return Date.now()
     },
+    spotify_tracks_class(){
+        if (this.spotify_tracks.length > 0){
+          return 'active-cat'
+        }
+    }
   },
 };
 </script>
 
-
-<style>
-  html, .songs-section{
-    background-color: #36454f;
-  }
-  h1, .song, .song .song_name{
-    color: #bdcad6;
-  }
-  .music{
-    padding: 0 85px;
-  }
-  .download-song{
-    cursor: pointer;
-  }
-  .table{
-    background-color: rgba(255, 255, 255, 0.7);
-    color: #000;
-  }
-  iframe {
-    width: 100%;
-  }
-  .green{
-    color: #28a745;
-  }
-  .song{
-    display: flex;
-    flex-direction: row;
-    padding: 16px 0;
-    border-bottom: 1px solid #f1f1f1;
-    transition: all 0.3s ease-out;
-  }
-  .song .song_name h5{
-    transition: all 0.3s ease-out;
-    border-bottom: 1px solid transparent;
-  }
-  .song .song_name h5:after{
-    content: '';
-    display: block;
-    position: relative;
-    border-bottom: 1px solid white;
-    width: 0px;
-    transition: all 2s ease-out;
-  }
-  .song:hover{
-    background: #647b8e;
-  }
-  .song:hover .song_name h5{
-    /*border-color: #f1f1f1;*/
-  }
-  .song:hover .song_name h5:after{
-    width: 80%;
-  }
-  .song .song_num{
-    width: 5%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .song .song_num > *{
-    margin: 0;
-  }
-  .song img{
-    width: 70px;
-  }
-  .song .song_name{
-    width: 60%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin: 0 auto;
-    padding: 0;
-  }
-  .song .song_name > *{
-    margin: 0;
-  }
-  .songs-section{
-    margin-top: 25px;
-  }
-  .song .song-actions{
-    width: 22%;
-  }
-  .top-filters{
-    margin-top:20px;
-  }
-  .prev_iframe{
-    position: fixed;
-    top:0;
-    right:0;
-    height: 300px;
-    z-index:9999;
-  }
-  .padd_top{
-    padding-top: 350px;
-  }
-  #topbutton {
-      position: fixed;
-      opacity: 0;
-      overflow: hidden;
-      text-align: center;
-      z-index: 99999999;
-      background-color: #777777;
-      color: #eeeeee;
-      width: 50px;
-      height: 48px;
-      line-height: 48px;
-      right: 30px;
-      bottom: 30px;
-      padding-top: 2px;
-      border-top-left-radius: 10px;
-      border-top-right-radius: 10px;
-      border-bottom-right-radius: 10px;
-      border-bottom-left-radius: 10px;
-      -webkit-transition: all 0.5s ease-in-out;
-      -moz-transition: all 0.5s ease-in-out;
-      -ms-transition: all 0.5s ease-in-out;
-      -o-transition: all 0.5s ease-in-out;
-      transition: all 0.5s ease-in-out;
-      cursor: pointer;
-  }
-  #topbutton.show {
-      visibility: visible;
-      cursor: pointer;
-      opacity: 1.0;
-  }
-  #topbutton.hide{
-    visibility: hidden;
-  }
-  #topbutton .fa{
-    padding-top: 6px;
-  }
-  .prev_iframe .close-video{
-    display: inline-block;
-    position: absolute;
-    right: 32px;
-    top: 0;
-    color: white;
-    font-size: 45px;
-  }
-  .prev_iframe .close-video a{
-    color: white;
-  }
-
-  /**
-  input[type=checkbox]:checked + label img
-  {
-    border: 1px solid blue;
-  }
-   */
-
-  .selected{
-    border: 1px solid blue;
-  }
-  .img_modal{
-    position: relative;
-  }
-  .img_modal .modal_btn, .bs_datepicker{
-    position: absolute;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-  }
-  .img_modal .modal_btn button{
-    height:100%;
-    opacity:0;
-  }
-  .bs_datepicker input{
-    height:100%;
-    opacity:0;
-  }
-  .search_box{
-    margin-top: 15px;
-  }
-
-  @media (max-width: 768px){
-    .music{
-      padding: 0 0;
-    }
-    .song img{
-      margin: 0 15px;
-    }
-    .song .song_name{
-      width: 100%;
-    }
-  }
+<style lang="scss">
+  @import "../styles/music.scss";
 </style>

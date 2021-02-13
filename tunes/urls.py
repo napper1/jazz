@@ -23,6 +23,9 @@ urlpatterns = [
     url(r'^api/lookup-song/$', views.lookup_song, name='lookup_song'),
     url(r'^api/backup-music/$', views.backup_music, name='backup_music'),
 
+    url(r'^spotify/callback/$', views.spotify_callback, name='spotify_callback'),
+    url(r'^spotify/user/tracks/$', views.get_spotify_user_tracks, name='get_spotify_user_tracks'),
+
     # url(r'^test/$', TemplateView.as_view(template_name='test.html'), name='suggestions'),
 
 ]

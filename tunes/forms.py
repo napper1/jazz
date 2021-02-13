@@ -1,5 +1,4 @@
 from django import forms
-from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.forms import CheckboxSelectMultiple
 
 from .models import Song, MediaFile
@@ -11,16 +10,13 @@ class SongForm(forms.ModelForm):
 
     class Meta:
         model = Song
-        fields = ('title', 'link', 'tags',)
+        fields = ('title', 'link', 'tags', 'category', )
 
 
 class ManySelectForm(forms.Form):
 
     songs = forms.ModelMultipleChoiceField(queryset=Song.objects.all(),
                                            widget=CheckboxSelectMultiple())
-
-        # def __init__(self, *args, **kwargs):
-    #     super(ManySelectForm, self).__init__()
 
 
 class MediaForm(forms.ModelForm):

@@ -4,8 +4,8 @@ from django.db.models import Q
 from django.utils.timezone import now
 from rest_framework import viewsets
 
-from tunes.models import Artist, Song
-from tunes.serializers import ArtistSerializer, SongSerializer
+from tunes.models import Artist, Song, SongCategory
+from tunes.serializers import ArtistSerializer, SongSerializer, SongCategorySerializer
 
 
 class ArtistViewSet(viewsets.ModelViewSet):
@@ -23,6 +23,11 @@ class ArtistViewSet(viewsets.ModelViewSet):
         return qs
 
 
+class SongCategoryViewSet(viewsets.ModelViewSet):
+    queryset = SongCategory.objects.all()
+    serializer_class = SongCategorySerializer
+
+
 class SongViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing artists.
@@ -38,8 +43,11 @@ class SongViewSet(viewsets.ModelViewSet):
         show = self.request.GET.get('show')
         search_yt = self.request.GET.get('search_yt')
         limit = self.request.GET.get("limit")
+        category = self.request.GET.get("category")
         if artist:
             qs = qs.filter(artist=artist)
+        if category:
+            qs = qs.filter(category_id=category)
         if q:
             qs = qs.filter(Q(title__icontains=q) |
                            Q(artist__name__icontains=q))[:10]

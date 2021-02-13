@@ -23,9 +23,11 @@ from taggit.models import Tag
 from weasyprint import CSS, HTML
 from weasyprint.fonts import FontConfiguration
 
+from tunes.utils import save_spotify_track
 from .forms import SongForm, ManySelectForm, MediaForm
 from .models import Song, Artist, SongDocument
 from youtube_api.models import Video
+import tekore as tk
 
 
 def index(request):
@@ -101,6 +103,7 @@ def add_song(request):
             data['song_id'] = song.id
             data['title'] = song.title
             data['link'] = song.link
+            data['category'] = song.category.title if song.category else ""
         else:
             data['response'] = False
             data['errors'] = form.errors
@@ -174,17 +177,17 @@ def export_music(request):
         pseudo_buffer = Echo()
         writer = csv.writer(pseudo_buffer)
         response = StreamingHttpResponse((writer.writerow(get_row(obj)) for obj in qs), content_type="text/csv")
-        response['Content-Disposition'] = 'attachment; filename="my-songs-export-%s.csv"' % datetime.datetime.now()
+        response['Content-Disposition'] = 'attachment; filename="songs-export-%s.csv"' % datetime.datetime.now().strftime('%Y-%m-%d-%s')
         return response
     return redirect(index)
 
 
 def get_row(obj):
     row = [
-        str(obj.id).encode('utf-8'),
-        str(obj.title).encode('utf-8'),
-        str(obj.link).encode('utf-8'),
-        str(obj.tab_link).encode('utf-8'),
+        obj.id,
+        obj.title,
+        obj.artist.name if obj.artist else "",
+        obj.link,
     ]
     return row
 
@@ -323,3 +326,54 @@ def backup_music(request):
     # run a task in the background to backup the database to Dropbox
     backup_database()
     return JsonResponse({"response":"success"})
+
+
+@csrf_exempt
+def spotify_callback(request):
+    """
+    Note - you need to manually copy the full URL with ?code= and paste it into runserver terminal where prompted.
+    This is due to running it only on localhost (production would need a hosted domain)
+    """
+    # this is the way we will auth on Localhost
+    client_id = settings.SPOTIFY_CLIENT_ID
+    client_secret = settings.SPOTIFY_SECRET
+    redirect_uri = settings.SPOTIFY_REDIRECT_URL
+    conf = (client_id, client_secret, redirect_uri)
+    file = settings.SPOTIFY_LOCAL_FILE
+    # save file so we can read credentials in future calls
+    token = tk.prompt_for_user_token(*conf, scope=tk.scope.every)
+    tk.config_to_file(file, conf + (token.refresh_token,))
+    return JsonResponse({'response': 'spotify login successful'})
+
+
+@csrf_exempt
+def get_spotify_user_tracks(request):
+    # read credentials from the saved file from callback
+
+    file = settings.SPOTIFY_LOCAL_FILE
+    conf = tk.config_from_file(file, return_refresh=True)
+    token = tk.refresh_user_token(*conf[:2], conf[3])
+
+    spotify = tk.Spotify(token)
+    spotify_tracks = spotify.saved_tracks()
+    tracks = []
+    for saved_track in spotify_tracks.items:
+        track = saved_track.track
+        album = track.album
+        images = list(album.images)
+        image = images[0].url
+        spotify_link = tk.to_url('track', track.id)
+        _artists = album.artists
+        artists = []
+        for artist in _artists:
+            artists.append(artist.name)
+        t = {
+            'title': track.name,
+            'artists': artists,
+            'image': image,
+            'url': spotify_link,
+            'preview_url': track.preview_url,
+        }
+        tracks.append(t)
+        save_spotify_track(track, artists, spotify_link)
+    return JsonResponse(tracks, safe=False)
