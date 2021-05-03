@@ -71,6 +71,7 @@
           <div class="row songs-section">
             <div class="col">
               <h1>{{ title }}</h1>
+              <customsongs></customsongs>
               <spotifytracks :tracks="spotify_tracks"></spotifytracks>
               <div class="row" v-for="(song, index) in songs" :key="index">
                 <div class="col-sm-12">
@@ -88,7 +89,10 @@
                         </div>
                         <div class="col-10">
                           <div class="song_name">
-                            <h5><strong>{{ song.title }}</strong> <b-badge v-if="song.song_category">{{ song.song_category.title }}</b-badge></h5>
+                            <h5><strong>{{ song.title }}</strong>
+                              <b-icon v-if="song.song_category && song.song_category.title == 'Favourites'" icon="heart-fill" aria-hidden="true" class="heart-icon"></b-icon>
+                              <b-badge v-else-if="song.song_category">{{ song.song_category.title }}</b-badge>
+                            </h5>
                             <p class="artist">{{ song.artist.name }} </p>
                           </div>
                         </div>
@@ -120,7 +124,7 @@
                             <i class="fa fa-download" aria-hidden="true"></i>
                             Download to media
                           </b-dropdown-item>
-                          <b-dropdown-item v-if="song.downloaded" class="download-song" :href="api_host + song.media_link" target="_blank">
+                          <b-dropdown-item v-if="song.downloaded" class="download-song" :href="song.media_link" target="_blank">
                             <i class="fa fa-download" aria-hidden="true"></i>
                             Download to device
                           </b-dropdown-item>
@@ -136,82 +140,18 @@
         </div>
       </div>
     </div>
-    <b-modal ref="addSongModal"
-             id="song-modal"
-             title="Add a new song"
-             hide-footer>
-      <b-form @submit="onSubmit" @reset="onReset" class="w-100">
-      <b-form-group id="form-title-group"
-                    label="Title:"
-                    label-for="form-title-input">
-          <b-form-input id="form-title-input"
-                        type="text"
-                        v-model="addSongForm.title"
-                        required
-                        placeholder="Title">
-          </b-form-input>
-        </b-form-group>
-        <b-form-group id="form-artist-group"
-                      label="Artist:"
-                      label-for="form-artist-input">
-            <b-form-input id="form-artist-input"
-                          type="text"
-                          v-model="addSongForm.artist"
-                          required
-                          placeholder="Artist">
-            </b-form-input>
-          </b-form-group>
-          <b-form-group id="form-link-group" label="Link:" label-for="form-link-input">
-            <b-form-input id="form-link-input" type="text" v-model="addSongForm.link" placeholder="YouTube link">
-            </b-form-input>
-          </b-form-group>
-          <b-form-group id="form-category-group"
-                        label="Category:"
-                        label-for="form-artist-input">
-            <b-form-select v-model="addSongForm.selected_category" :options="song_categories"></b-form-select>
-          </b-form-group>
-        <b-button type="submit" variant="primary">Submit</b-button>
-        <b-button type="reset" variant="danger">Reset</b-button>
-      </b-form>
-    </b-modal>
-    <b-modal ref="editSongModal"
-             id="song-update-modal"
-             title="Update"
-             hide-footer>
-      <b-form @submit="onSubmitUpdate" @reset="onResetUpdate" class="w-100">
-        <b-form-group id="form-title-group"
-                      label="Title:"
-                      label-for="form-title-input">
-          <b-form-input id="form-title-input"
-                        type="text"
-                        v-model="editForm.title"
-                        required
-                        placeholder="Enter title">
-          </b-form-input>
-        </b-form-group>
-        <b-form-group id="form-artist-group"
-                      label="Artist:"
-                      label-for="form-artist-input">
-          <b-form-input id="form-artist-input"
-                        type="text"
-                        v-model="editForm.artist.name"
-                        required
-                        placeholder="Enter artist">
-          </b-form-input>
-        </b-form-group>
-        <b-form-group id="form-link-group" label="Link:" label-for="form-link-input">
-          <b-form-input id="form-link-input" type="text" v-model="editForm.link" placeholder="Enter link">
-          </b-form-input>
-        </b-form-group>
-        <b-form-group id="form-song-category-group"
-                        label="Category:"
-                        label-for="form-category-input">
-            <b-form-select v-model="editForm.selected_category" :options="song_categories"></b-form-select>
-        </b-form-group>
-        <b-button type="submit">Update</b-button>
-        <b-button @click="hideEditModal" variant="danger">Cancel</b-button>
-      </b-form>
-    </b-modal>
+
+    <AddSongModal
+      v-on:refresh-songs="addSongComplete"
+      :song_categories="song_categories"
+    />
+
+    <EditSongModal
+      v-on:refresh-songs="addSongComplete"
+      :song_categories="song_categories"
+      :song="active_song"
+    />
+
     <b-modal ref="previewSongModal"
              id="song-preview-modal"
              title="Preview"
@@ -240,6 +180,9 @@ import { Circle2 } from 'vue-loading-spinner'
 import VueYouTubeEmbed from 'vue-youtube-embed'
 import datePicker from 'vue-bootstrap-datetimepicker';
 import SpotifyTracks from "./SpotifyTracks";
+import CustomSongs from "./CustomSongs";
+import AddSongModal from "./AddSongModal";
+import EditSongModal from "./EditSongModal";
 
 export default {
   name: 'Music',
@@ -247,19 +190,6 @@ export default {
     return {
       songs: [],
       message: '',
-      addSongForm: {
-        title: '',
-        artist: '',
-        link: '',
-        selected_category: '',
-      },
-      editForm: {
-        id: '',
-        title: '',
-        artist: '',
-        link: '',
-        selected_category: '',
-      },
       loading: false,
       filter_loading: false,
       selected_song: null,
@@ -273,7 +203,6 @@ export default {
       hide_scroller: false,
       videoId: '',
       show_video_box: false,
-      api_host: 'http://localhost:8000',
       date: new Date(),
       options: {
           format: 'DD/MM/YYYY',
@@ -291,7 +220,7 @@ export default {
       alert_delay_time: 1500,
       show_alert_msg: false,
       selected_category: "",
-      active_song: "",
+      active_song: {},
       spotify_tracks: [],
       title: "All Songs",
     };
@@ -303,10 +232,13 @@ export default {
     Circle2,
     datePicker,
     spotifytracks: SpotifyTracks,
+    customsongs: CustomSongs,
+    AddSongModal,
+    EditSongModal,
   },
   methods: {
     lookupSong() {
-      const path = this.api_host + '/songs/?q=' + this.song_query;
+      const path = '/songs/?q=' + this.song_query;
       axios.get(path)
         .then((response) => {
           this.songs = response.data;
@@ -329,7 +261,7 @@ export default {
       formData.append('file', this.file);
       formData.append('file_second', this.file_second);
       formData.append('groups', blob);
-      axios.post(this.api_host + '/api-document/', formData, {headers: {'Content-Type': 'multipart/form-data'}})
+      axios.post('/api-document/', formData, {headers: {'Content-Type': 'multipart/form-data'}})
         .then(() => {
           console.log("doc saved");
         })
@@ -350,7 +282,7 @@ export default {
     getSongs() {
       this.spotify_tracks = [];
       this.filter_loading = true;
-      const path = this.api_host + '/songs/';
+      const path = '/songs/';
       axios.get(path)
         .then((res) => {
           this.songs = res.data;
@@ -363,7 +295,7 @@ export default {
         });
     },
     getSongCategories() {
-      const path = this.api_host + '/song-categories/';
+      const path = '/song-categories/';
       axios.get(path)
           .then((res) => {
               var data = res.data;
@@ -377,94 +309,9 @@ export default {
               console.log(error);
           })
     },
-    addSong(payload) {
-      const path = this.api_host + '/api-add-song/';
-      const delay = ms => new Promise(res => setTimeout(res, ms));
-      axios.post(path, payload)
-        .then(() => {
-          this.getSongs();
-          this.show_alert_msg = true;
-          this.message = "Song added!";
-          this.removeAlert();
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.log(error);
-          this.getSongs();
-        });
-    },
-    initForm() {
-      this.addSongForm.title = '';
-      this.addSongForm.artist = '';
-      this.addSongForm.link = '';
-      this.addSongForm.selected_category = '';
-      this.editForm.id = '';
-      this.editForm.title = '';
-      this.editForm.artist = '';
-      this.editForm.link = '';
-      this.editForm.selected_category = '';
-    },
-    onSubmit(evt) {
-      evt.preventDefault();
-      this.$refs.addSongModal.hide();
-      const payload = {
-        title: this.addSongForm.title,
-        artist: this.addSongForm.artist,
-        link: this.addSongForm.link,
-        category: this.addSongForm.selected_category,
-      };
-      this.addSong(payload);
-      this.initForm();
-    },
-    onReset(evt) {
-      evt.preventDefault();
-      this.$refs.addSongModal.hide();
-      this.initForm();
-    },
     editSong(song) {
-      this.editForm = song;
-      console.log(this.editForm);
-      // var category_dict = {};
-      // this.song_categories.forEach(function(el){
-      //     if (el.value == song.category){
-      //         category_dict = el
-      //     }
-      // });
-      // console.log(category_dict)
-      if (song.category){
-        this.editForm.selected_category = song.category;
-      }
-    },
-    onSubmitUpdate(evt) {
-      evt.preventDefault();
-      this.$refs.editSongModal.hide();
-      console.log(evt);
-      const payload = {
-        title: this.editForm.title,
-        artist: this.editForm.artist.id,
-        link: this.editForm.link,
-        category: this.editForm.selected_category,
-      };
-      console.log(payload)
-      this.updateSong(payload, this.editForm.id);
-    },
-    updateSong(payload, song_id) {
-      const path = this.api_host + '/songs/' + song_id + '/';
-      axios.put(path, payload)
-        .then(() => {
-          this.getSongs();
-          this.show_alert_msg = true;
-          this.message = "Song updated!";
-          this.removeAlert();
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.error(error);
-          this.getSongs();
-          this.show_alert_msg = true;
-          this.message = "An error occurred!";
-          this.removeAlert();
-        });
+      // make the song available in the EditSongModal as a prop
+      this.active_song = song;
     },
     removeAlert() {
       // Clear the alert box by setting a timer for a few seconds before clearing alert message.
@@ -476,13 +323,8 @@ export default {
          // this.message = "";
       });
     },
-    onResetUpdate(evt) {
-      evt.preventDefault();
-      this.$refs.editSongModal.hide();
-      this.initForm();
-    },
     removeSong(song_id) {
-      const path = this.api_host + `/songs/${song_id}/`;
+      const path = `/songs/${song_id}/`;
       axios.delete(path)
         .then(() => {
           this.getSongs();
@@ -497,7 +339,7 @@ export default {
         });
     },
     getNextSong(song_id){
-      const path = this.api_host + `/api-get-next/${song_id}/`;
+      const path = `/api-get-next/${song_id}/`;
       axios.get(path)
         .then((res) => {
           this.song = res.data;
@@ -511,13 +353,13 @@ export default {
       this.removeSong(song.id);
     },
     downloadSong: function(song){
-      if (this.selected_song === song) this.selected_song = null
-      else this.selected_song = song
+      if (this.selected_song === song) this.selected_song = null;
+      else this.selected_song = song;
       this.loading = true;
-      axios.post(this.api_host + '/download/' + song.id + '/')
+      axios.post('/download/' + song.id + '/')
           .then(() => {
             this.show_alert_msg = true;
-            this.message = "Song downloaded to media folder!"
+            this.message = "Song downloaded to media folder!";
             this.loading = false;
             // refresh songs list
             this.getSongs();
@@ -532,12 +374,12 @@ export default {
     },
     getEmbedUrl: function(song){
       var link = song.link;
-      var song_id = link.split('?v=')[1]
+      var song_id = link.split('?v=')[1];
       return 'https://www.youtube.com/embed/' + song_id
     },
     getSongID: function(song){
       var link = song.link;
-      var song_id = link.split('?v=')[1]
+      var song_id = link.split('?v=')[1];
       return song_id
     },
     showPreview: function(song){
@@ -584,10 +426,10 @@ export default {
     },
     backupMusic: function(){
       this.loading = true;
-      axios.post(this.api_host + '/api/backup-music/')
+      axios.post('/api/backup-music/')
           .then(() => {
             this.show_alert_msg = true;
-            this.message = "Songs backed up to Dropbox!"
+            this.message = "Songs backed up to Dropbox!";
             this.loading = false;
             this.removeAlert();
           })
@@ -598,14 +440,11 @@ export default {
             this.removeAlert();
           });
     },
-    hideEditModal() {
-      this.$refs['editSongModal'].hide();
-    },
     filterSongsByCategory: function(category){
       this.selected_category = category;
       this.title = this.selected_category['text'];
       this.filter_loading = true;
-      const path = this.api_host + '/songs/?category=' + category.value;
+      const path = '/songs/?category=' + category.value;
       axios.get(path)
         .then((response) => {
           this.songs = response.data;
@@ -636,7 +475,7 @@ export default {
         this.active_song = song;
     },
     spotifyLogin(){
-      const path = this.api_host + '/spotify/callback/';
+      const path = '/spotify/callback/';
       axios.get(path)
           .then((response) => {
               console.log(response);
@@ -647,7 +486,7 @@ export default {
     },
     getSpotifyTracks(){
       this.title = "Spotify Tracks";
-      const path = this.api_host + '/spotify/user/tracks';
+      const path = '/spotify/user/tracks';
       axios.get(path)
         .then((response) => {
             console.log(response);
@@ -658,11 +497,18 @@ export default {
         .catch((error) => {
             console.log(error);
         })
-    }
+    },
+    addSongComplete(message){
+      this.getSongs();
+      this.show_alert_msg = true;
+      this.message = message;
+      this.removeAlert();
+    },
   },
   created() {
     this.getSongs();
     this.getSongCategories();
+    // this.$store.dispatch('getSongs')
   },
   computed: {
     now: function(){

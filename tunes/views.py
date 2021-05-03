@@ -146,6 +146,7 @@ def remove_song(request):
                 song.delete()
                 data['response'] = True
         return JsonResponse(data=data)
+    return HttpResponse(403)
 
 
 @csrf_exempt
