@@ -32,7 +32,7 @@ class SongViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing artists.
     """
-    queryset = Song.objects.all()
+    queryset = Song.objects.all().select_related('artist', 'category')
     serializer_class = SongSerializer
     filter_fields = ('is_favourite',)
 
@@ -58,4 +58,4 @@ class SongViewSet(viewsets.ModelViewSet):
             qs = qs.filter(last_played__isnull=False).order_by('-last_played')[:5]
         if limit == "short":
             qs = qs[:5]
-        return qs
+        return qs.select_related('artist', 'category')
