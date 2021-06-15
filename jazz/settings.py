@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 import logging
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -48,7 +50,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'dbbackup',
     'background_task',
-    'nplusone.ext.django',
 ]
 
 MIDDLEWARE = [
@@ -60,7 +61,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'nplusone.ext.django.NPlusOneMiddleware',
 ]
 
 ROOT_URLCONF = 'jazz.urls'
@@ -136,6 +136,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -166,10 +167,6 @@ SPOTIFY_CLIENT_ID = os.environ.get("SPOTIFY_CLIENT_ID", "")
 SPOTIFY_SECRET = os.environ.get("SPOTIFY_SECRET", "")
 SPOTIFY_REDIRECT_URL = os.environ.get("SPOTIFY_REDIRECT_URL", "")
 SPOTIFY_LOCAL_FILE = 'tekore.cfg'
-
-
-NPLUSONE_LOGGER = logging.getLogger('nplusone')
-NPLUSONE_LOG_LEVEL = logging.WARN
 
 
 LOGGING = {

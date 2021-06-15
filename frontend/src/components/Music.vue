@@ -508,6 +508,7 @@ export default {
   created() {
     this.getSongs();
     this.getSongCategories();
+    console.log(process.env.NODE_ENV);
     // this.$store.dispatch('getSongs')
   },
   computed: {

@@ -18,7 +18,7 @@ import DatatableFactory from 'vuejs-datatable';
 import VueYouTubeEmbed from 'vue-youtube-embed'
 import axios from 'axios';
 
-axios.defaults.baseURL = `http://localhost:8000`;
+axios.defaults.baseURL = `http://localhost:8001`;
 Vue.config.productionTip = false
 Vue.use(BootstrapVue);
 // Vue.use(IconsPlugin);
